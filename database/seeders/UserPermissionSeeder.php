@@ -31,8 +31,8 @@ class UserPermissionSeeder extends Seeder
         $user = User::create([
             'name' => 'gober',
             'username' => 'indra',
-            'email' => 'indra@gmail.com',
-            'password' => Hash::make('12345')
+            'email' => 'indrafar@gmail.com',
+            'password' => Hash::make('1122334')
         ]);
 
         // Membuat role
