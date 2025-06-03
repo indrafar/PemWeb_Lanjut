@@ -33,8 +33,7 @@ export function AppSidebar() {
                 <SidebarGroup>
                     <SidebarGroupLabel className="mb-4">
                         <div className="flex items-center gap-4">
-                            <Zap className="text-white cursor-pointer"/>
-                            <span className="text-xl text-white font-bold">Laravel TSX</span>
+                            <img src="/images/Noted.png" alt="Noted" className="w-35 h-8" />
                         </div>
                     </SidebarGroupLabel>
                     <SidebarGroupContent>

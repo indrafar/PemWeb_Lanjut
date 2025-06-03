@@ -33,14 +33,14 @@ export default function Login({
             <Head title="Log in" />
 
             {status && (
-                <div className="mb-4 text-sm font-medium text-green-600">
+                <div className="mb-4 text-sm font-medium text-green-600 bg-green-100 border border-green-300 rounded p-2">
                     {status}
                 </div>
             )}
 
             <form onSubmit={submit}>
                 <div>
-                    <InputLabel htmlFor="username" value="username" />
+                    <InputLabel htmlFor="username" value="Username" />
 
                     <TextInput
                         id="username"
@@ -78,10 +78,7 @@ export default function Login({
                             name="remember"
                             checked={data.remember}
                             onChange={(e) =>
-                                setData(
-                                    'remember',
-                                    (e.target.checked || false) as false,
-                                )
+                                setData('remember', e.target.checked)
                             }
                         />
                         <span className="ms-2 text-sm text-gray-600">
@@ -105,6 +102,16 @@ export default function Login({
                     </PrimaryButton>
                 </div>
             </form>
+            
+            <div className="mt-6 text-center text-sm text-gray-600">
+                Don’t have an account?{' '}
+                <Link
+                    href={route('register')}
+                    className="text-indigo-600 hover:underline font-semibold"
+                >
+                    Register
+                </Link>
+            </div>
         </GuestLayout>
     );
 }
