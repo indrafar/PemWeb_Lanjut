@@ -3,45 +3,55 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
-export default function Login({
-    status,
-    canResetPassword,
-}: {
-    status?: string;
-    canResetPassword: boolean;
-}) {
-    const { data, setData, post, processing, errors, reset } = useForm({
+export default function Login({ status, canResetPassword }: { status?: string; canResetPassword: boolean }) {
+    const { data, setData, post, processing, errors, reset } = useForm<{
+        username: string;
+        password: string;
+        remember: boolean;
+    }>({
         username: '',
         password: '',
-        remember: false as boolean,
+        remember: false,
     });
+
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-
-        post(route('login'), {
-            onFinish: () => reset('password'),
-        });
+        post(route('login'), { onFinish: () => reset('password') });
     };
 
     return (
-        <GuestLayout>
+        <>
             <Head title="Log in" />
 
-            {status && (
-                <div className="mb-4 text-sm font-medium text-green-600 bg-green-100 border border-green-300 rounded p-2">
-                    {status}
-                </div>
-            )}
+<div className="min-h-screen flex items-center justify-center bg-[#1B355E]">
+    <div className="w-full max-w-6xl bg-white rounded-2xl shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
+        {/* Ilustrasi Kiri */}
+        <div className="hidden md:block relative bg-[#A1B6D9]">
+            <img
+                src="https://img.freepik.com/free-photo/view-messy-office-workspace-with-laptop_23-2150282014.jpg?ga=GA1.1.9329213.1710743119&semt=ais_items_boosted&w=740"
+                alt="Login Illustration"
+                className="absolute inset-0 w-full h-full object-cover"
+            />
+            {/* Overlay gelap */}
+            <div className="absolute inset-0 bg-black/60"></div>
+            {/* Logo di atas overlay */}
+            <div className="relative z-10 flex items-center justify-center h-full">
+                <img src="/PemWeb_Lanjut/public/images/logonoted.png" alt="Logo" className="w-40 h-auto" />
+            </div>
+        </div>
 
-            <form onSubmit={submit}>
+
+        {/* Form Kanan */}
+        <div className="p-12">
+            <h1 className="text-4xl font-bold text-[#1B355E] mb-8">Create account</h1>
+
+            <form onSubmit={submit} className="space-y-6">
                 <div>
-                    <InputLabel htmlFor="username" value="Username" />
-
+                    <InputLabel htmlFor="username" value="Username" className="text-[#1B355E]" />
                     <TextInput
                         id="username"
                         type="text"
@@ -52,13 +62,11 @@ export default function Login({
                         isFocused={true}
                         onChange={(e) => setData('username', e.target.value)}
                     />
-
                     <InputError message={errors.username} className="mt-2" />
                 </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
+                <div>
+                    <InputLabel htmlFor="password" value="Password" className="text-[#1B355E]" />
                     <TextInput
                         id="password"
                         type="password"
@@ -68,50 +76,43 @@ export default function Login({
                         autoComplete="current-password"
                         onChange={(e) => setData('password', e.target.value)}
                     />
-
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
-                <div className="mt-4 block">
-                    <label className="flex items-center">
-                        <Checkbox
-                            name="remember"
-                            checked={data.remember}
-                            onChange={(e) =>
-                                setData('remember', e.target.checked)
-                            }
-                        />
-                        <span className="ms-2 text-sm text-gray-600">
-                            Remember me
-                        </span>
-                    </label>
+                <div className="flex items-center">
+                    <Checkbox
+                        name="remember"
+                        checked={data.remember}
+                        onChange={(e) => setData('remember', e.target.checked)}
+                    />
+                    <span className="ml-2 text-sm text-gray-600">Remember me</span>
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
+                <div className="flex items-center justify-between">
                     {canResetPassword && (
-                        <Link
-                            href={route('password.request')}
-                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        >
+                        <Link href={route('password.request')} className="text-sm text-gray-600 hover:underline">
                             Forgot your password?
                         </Link>
                     )}
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
+                    <PrimaryButton
+                        className="bg-[#396EC4] hover:bg-[#1B355E] text-white px-6 py-2 rounded"
+                        disabled={processing}
+                    >
                         Log in
                     </PrimaryButton>
                 </div>
             </form>
-            
-            <div className="mt-6 text-center text-sm text-gray-600">
+
+            <div className="mt-8 text-center text-sm text-gray-600">
                 Don’t have an account?{' '}
-                <Link
-                    href={route('register')}
-                    className="text-indigo-600 hover:underline font-semibold"
-                >
+                <Link href={route('register')} className="text-[#396EC4] hover:underline font-semibold">
                     Register
                 </Link>
             </div>
-        </GuestLayout>
+        </div>
+    </div>
+</div>
+
+        </>
     );
 }
