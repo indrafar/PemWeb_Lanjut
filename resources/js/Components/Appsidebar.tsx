@@ -1,57 +1,57 @@
-import {LayoutDashboard,UserRoundCog, Zap} from "lucide-react"
-
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-} from "@/Components/ui/sidebar"
-import {Link} from "@inertiajs/react"
-
-// Menu items.
-const items = [
-    {
-        title: "Dashboard",
-        url: "dashboard",
-        icon: LayoutDashboard,
-    },
-    {
-        title: "Roles",
-        url: "roles",
-        icon: UserRoundCog,
-    },
-]
+import React, { useContext } from 'react';
+import { SidebarContext } from '@/Components/ui/sidebar'; 
+import { Link, usePage } from '@inertiajs/react';
+import clsx from 'clsx';
 
 export function AppSidebar() {
-    return (
-        <Sidebar>
-            <SidebarContent className="bg-gradient-to-b from-slate-800 to-gray-900">
-                <SidebarGroup>
-                    <SidebarGroupLabel className="mb-4">
-                        <div className="flex items-center gap-4">
-                            <img src="/images/Noted.png" alt="Noted" className="w-35 h-8" />
-                        </div>
-                    </SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <SidebarMenu>
-                            {items.map((item) => (
-                                <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton asChild className="hover:bg-slate-700 active:bg-slate-700">
-                                        <Link href={item.url ? route(item.url) : "#"}>
-                                            <item.icon className="text-white"/>
-                                            <span className="text-white">{item.title}</span>
-                                        </Link>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
-            </SidebarContent>
-        </Sidebar>
-    )
+  const context = useContext(SidebarContext);
+  if (!context) throw new Error('AppSidebar must be used inside SidebarProvider');
+
+  const { isOpen } = context;
+  const { url } = usePage();
+
+  const navItems = [
+    { name: 'Dashboard', href: '/dashboard' },
+    { name: 'Task', href: '/tasks' },
+    { name: 'Projects', href: '/projects' },
+    { name: 'Notifications', href: '/notifications' },
+    { name: 'Roles', href: '/roles' },
+    { name: 'Trash', href: '/trash' },
+  ];
+
+  if (!isOpen) return null;
+
+  return (
+    <aside className="w-64 h-screen p-4 shadow" style={{ backgroundColor: '#A1B6D9' }}>
+      {/* Logo di atas */}
+      <div className="mb-6 flex items-center justify-center">
+        <img 
+          src="/images/logonoted.png" 
+          alt="Logo" 
+          className="h-12 w-auto select-none" 
+          draggable={false}
+        />
+      </div>
+
+      <nav className="space-y-2">
+        {navItems.map((item) => {
+          const isActive = url.startsWith(item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={clsx(
+                'block px-4 py-2 rounded transition-colors',
+                isActive
+                  ? 'bg-[#1B355E] font-semibold text-white'  // aktif: background gelap, teks putih
+                  : 'text-[#1B355E] hover:bg-[#335DA2] hover:text-white'  // non aktif: teks #1B355E, hover bg & teks terang
+              )}
+            >
+              {item.name}
+            </Link>
+          );
+        })}
+      </nav>
+    </aside>
+  );
 }

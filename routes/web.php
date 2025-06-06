@@ -1,5 +1,7 @@
 <?php
 
+
+
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\API\AuthController;
@@ -34,6 +36,26 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::get('/tasks', function () {
+    return Inertia::render('Tasks');
+})->middleware(['auth', 'verified'])->name('tasks');
+
+Route::get('/projects', function () {
+    return Inertia::render('Projects');
+})->middleware(['auth', 'verified'])->name('projects');
+
+Route::get('/notifications', function () {
+    return Inertia::render('Notifications');
+})->middleware(['auth', 'verified'])->name('notifications');
+
+Route::get('/roles', function () {
+    return Inertia::render('Roles');
+})->middleware(['auth', 'verified'])->name('roles');
+
+Route::get('/trash', function () {
+    return Inertia::render('Trash');
+})->middleware(['auth', 'verified'])->name('trash');
 
 
 // Route login/register bawaan Laravel Breeze (atau Jetstream, dll)
