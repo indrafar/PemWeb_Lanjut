@@ -6,7 +6,17 @@ import { SidebarProvider } from "@/Components/ui/sidebar";
 import { AppSidebar } from "@/Components/Appsidebar";
 import { Link } from "@inertiajs/react";
 import Calendar from "react-calendar";
-import { PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+} from "recharts";
 import "../../css/calendar-custom.css";
 
 const pieData = [
@@ -29,34 +39,59 @@ export default function Dashboard() {
     <SidebarProvider>
       <div className="flex min-h-screen bg-white text-[#1B355E]">
         <AppSidebar />
-        <div className="flex flex-col flex-1 p-6 space-y-6 overflow-auto">
+        <div className="flex flex-col flex-1 p-4 sm:p-6 space-y-6 overflow-auto">
           {/* Top bar */}
-          <div className="flex items-center justify-between">
-            <div className="relative w-1/2">
-              <Input placeholder="Search" className="pl-10 rounded-full text-[#1B355E] bg-white" />
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="relative w-full sm:w-1/2">
+              <Input
+                placeholder="Search"
+                className="pl-10 rounded-full text-[#1B355E] bg-white w-full"
+              />
               <Search className="absolute top-2.5 left-3 w-4 h-4 text-[#1B355E]" />
             </div>
-            <Button className="rounded-full bg-white text-[#1B355E] px-6 py-1">Profile</Button>
+            <Link href="/profile" className="w-full sm:w-auto">
+              <Button className="rounded-full bg-white text-[#1B355E] px-6 py-1 w-full sm:w-auto">
+                Profile
+              </Button>
+            </Link>
           </div>
 
           {/* Task Summary Cards */}
-          <div className="grid grid-cols-4 gap-4">
-            <Card className="bg-[#1B355E] text-white p-4 font-semibold">All Tasks: 20</Card>
-            <Card className="bg-yellow-500 text-white p-4 font-semibold">In Progress: 10</Card>
-            <Card className="bg-red-500 text-white p-4 font-semibold">Stuck: 3</Card>
-            <Card className="bg-green-600 text-white p-4 font-semibold">Done: 7</Card>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="bg-[#1B355E] text-white p-4 font-semibold w-full">
+              All Tasks: 20
+            </Card>
+            <Card className="bg-yellow-500 text-white p-4 font-semibold w-full">
+              In Progress: 10
+            </Card>
+            <Card className="bg-red-500 text-white p-4 font-semibold w-full">
+              Stuck: 3
+            </Card>
+            <Card className="bg-green-600 text-white p-4 font-semibold w-full">
+              Done: 7
+            </Card>
           </div>
 
           {/* Charts and Calendar */}
-          <div className="grid grid-cols-12 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Pie Chart: Tasks by Status */}
-            <Card className="col-span-4 p-4">
-              <h2 className="font-bold mb-3">Tasks by Status</h2>
+            <Card className="lg:col-span-4 p-4 w-full">
+              <h2 className="font-bold mb-3 text-lg md:text-xl">
+                Tasks by Status
+              </h2>
               <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
-                  <Pie data={pieData} dataKey="value" nameKey="name" outerRadius={70}>
+                  <Pie
+                    data={pieData}
+                    dataKey="value"
+                    nameKey="name"
+                    outerRadius={70}
+                  >
                     {pieData.map((entry, index) => (
-                      <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                      <Cell
+                        key={index}
+                        fill={COLORS[index % COLORS.length]}
+                      />
                     ))}
                   </Pie>
                   <Tooltip />
@@ -65,8 +100,10 @@ export default function Dashboard() {
             </Card>
 
             {/* Bar Chart: Tasks by Due Date */}
-            <Card className="col-span-4 p-4">
-              <h2 className="font-bold mb-3">Tasks by Due Date</h2>
+            <Card className="lg:col-span-4 p-4 w-full">
+              <h2 className="font-bold mb-3 text-lg md:text-xl">
+                Tasks by Due Date
+              </h2>
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={barData}>
                   <XAxis dataKey="date" />
@@ -78,10 +115,13 @@ export default function Dashboard() {
             </Card>
 
             {/* Calendar */}
-            <Card className="col-span-4 bg-[#A1B6D9] p-4 text-white font-semibold">
-              <p className="mb-2">Calendar</p>
+            <Card className="lg:col-span-4 bg-[#A1B6D9] p-4 text-white font-semibold w-full">
+              <p className="mb-2 text-lg">Calendar</p>
               <div className="bg-white text-black rounded-md overflow-hidden [&_.react-calendar__tile--now]:bg-[#335DA2] [&_.react-calendar__tile--active]:bg-[#1B355E] [&_.react-calendar__tile--active]:text-white">
-                <Calendar className="w-full text-sm [&_button]:p-1 [&_abbr]:no-underline [&_abbr]:text-xs" calendarType="iso8601" />
+                <Calendar
+                  className="w-full text-sm [&_button]:p-1 [&_abbr]:no-underline [&_abbr]:text-xs"
+                  calendarType="iso8601"
+                />
               </div>
               <div className="mt-3">
                 <Link href="/calendar">
@@ -93,8 +133,10 @@ export default function Dashboard() {
             </Card>
 
             {/* Overdue Tasks */}
-            <Card className="col-span-6 p-4">
-              <h2 className="font-bold mb-2">Overdue Tasks</h2>
+            <Card className="lg:col-span-6 p-4 w-full">
+              <h2 className="font-bold mb-2 text-lg md:text-xl">
+                Overdue Tasks
+              </h2>
               <ul className="text-sm text-red-600 space-y-1">
                 <li>Update API Docs - Due: Jun 3</li>
                 <li>Design Review - Due: Jun 4</li>
@@ -102,8 +144,10 @@ export default function Dashboard() {
             </Card>
 
             {/* Tasks by Owner */}
-            <Card className="col-span-6 p-4">
-              <h2 className="font-bold mb-2">Tasks by Owner</h2>
+            <Card className="lg:col-span-6 p-4 w-full">
+              <h2 className="font-bold mb-2 text-lg md:text-xl">
+                Tasks by Owner
+              </h2>
               <ul className="text-sm space-y-1">
                 <li>Alice: 5 tasks</li>
                 <li>David: 7 tasks</li>
