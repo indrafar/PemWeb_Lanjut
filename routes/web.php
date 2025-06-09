@@ -5,6 +5,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -57,6 +58,14 @@ Route::get('/trash', function () {
     return Inertia::render('Trash');
 })->middleware(['auth', 'verified'])->name('trash');
 
+
+// Admin Routes
+Route::group(['middleware' => ['auth', 'verified']], function () {
+    Route::get('/manage-users', [UserController::class, 'index'])->name('users.index');
+    Route::post('/manage-users', [UserController::class, 'store'])->name('users.store');
+    Route::put('/manage-users/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/manage-users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+});
 
 // Route login/register bawaan Laravel Breeze (atau Jetstream, dll)
 require __DIR__.'/auth.php';

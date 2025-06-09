@@ -3,19 +3,30 @@ import { SidebarContext } from '@/Components/ui/sidebar';
 import { Link, usePage } from '@inertiajs/react';
 import clsx from 'clsx';
 
+interface PageProps {
+  auth: {
+    user: {
+      role: string;
+    };
+  };
+}
+
 export function AppSidebar() {
   const context = useContext(SidebarContext);
   if (!context) throw new Error('AppSidebar must be used inside SidebarProvider');
 
   const { isOpen } = context;
   const { url } = usePage();
+  const { auth } = usePage<PageProps>().props;
+
+  const isAdmin = auth.user?.role === 'Admin';
 
   const navItems = [
     { name: 'Dashboard', href: '/dashboard' },
     { name: 'Task', href: '/tasks' },
     { name: 'Projects', href: '/projects' },
-    { name: 'Notifications', href: '/notifications' },
-    { name: 'Roles', href: '/roles' },
+    // Only show Manage Users for admin
+    ...(isAdmin ? [{ name: 'Manage Users', href: '/manage-users' }] : []),
     { name: 'Trash', href: '/trash' },
   ];
 
