@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ProjectController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -42,9 +43,15 @@ Route::get('/tasks', function () {
     return Inertia::render('Tasks');
 })->middleware(['auth', 'verified'])->name('tasks');
 
-Route::get('/projects', function () {
-    return Inertia::render('Projects');
-})->middleware(['auth', 'verified'])->name('projects');
+// Project Routes
+Route::middleware(['auth'])->group(function () {
+    Route::prefix('projects')->group(function () {
+        Route::get('/', [ProjectController::class, 'index'])->name('projects.index');
+        Route::post('/', [ProjectController::class, 'store'])->name('projects.store');
+        Route::put('/{project}', [ProjectController::class, 'update'])->name('projects.update');
+        Route::delete('/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+    });
+});
 
 Route::get('/notifications', function () {
     return Inertia::render('Notifications');
