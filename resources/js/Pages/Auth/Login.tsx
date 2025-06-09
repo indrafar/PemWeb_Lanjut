@@ -39,11 +39,16 @@ export default function Login({ status, canResetPassword }: { status?: string; c
             {/* Overlay gelap */}
             <div className="absolute inset-0 bg-black/60"></div>
             {/* Logo di atas overlay */}
-            <div className="relative z-10 flex items-center justify-center h-full">
-                <img src="/PemWeb_Lanjut/public/images/logonoted.png" alt="Logo" className="w-40 h-auto" />
-            </div>
+        <div className="relative z-10 flex items-center justify-center h-full">
+            <img src="/images/logonoted.png" alt="Logo" className="w-40 h-auto" />
         </div>
-
+        </div>
+        {/* Status Message */}
+        {status && (
+            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-green-100 text-green-800 px-4 py-2 rounded shadow z-20">
+            {status}
+            </div>
+        )}
 
         {/* Form Kanan */}
         <div className="p-12">

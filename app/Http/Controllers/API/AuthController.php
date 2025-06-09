@@ -4,7 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -66,20 +67,30 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->only('username', 'password');
+        $credentials = $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string',
+        ]);
 
-        if (!$token = JWTAuth::attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+            $role = $user->role;
+
+            return response()->json([
+                'user' => $user,
+                'role' => $role,
+                'message' => 'Login successful'
+            ]);
         }
 
         return response()->json([
-            'status' => '200',
-            'message' => 'Successfully',
-            'data' => [
-                'access_token' => $token,
-                'token_type' => 'bearer',
-                'expires_in' => auth()->factory()->getTTL() * 60
-            ]
-        ], 200);
+            'message' => 'Invalid credentials'
+        ], 401);
+    }
+
+    public function logout()
+    {
+        Auth::logout();
+        return response()->json(['message' => 'Successfully logged out']);
     }
 }

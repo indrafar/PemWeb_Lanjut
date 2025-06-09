@@ -9,8 +9,10 @@ export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
         username: '',
+        email: '',
         password: '',
         password_confirmation: '',
+        role: 'Anggota Tim', // Default role
     });
 
     const submit: FormEventHandler = (e) => {
@@ -44,6 +46,7 @@ export default function Register() {
                         <h1 className="text-4xl font-bold text-[#1B355E] mb-8">Create account</h1>
 
                         <form onSubmit={submit} className="space-y-6">
+                            {/* Name field */}
                             <div>
                                 <InputLabel htmlFor="name" value="Name" className="text-[#1B355E]" />
                                 <TextInput
@@ -59,6 +62,7 @@ export default function Register() {
                                 <InputError message={errors.name} className="mt-2" />
                             </div>
 
+                            {/* Username field */}
                             <div>
                                 <InputLabel htmlFor="username" value="Username" className="text-[#1B355E]" />
                                 <TextInput
@@ -73,6 +77,23 @@ export default function Register() {
                                 <InputError message={errors.username} className="mt-2" />
                             </div>
 
+                            {/* Email field */}
+                            <div>
+                                <InputLabel htmlFor="email" value="Email" className="text-[#1B355E]" />
+                                <TextInput
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    value={data.email}
+                                    className="mt-1 block w-full"
+                                    autoComplete="email"
+                                    onChange={(e) => setData('email', e.target.value)}
+                                    required
+                                />
+                                <InputError message={errors.email} className="mt-2" />
+                            </div>
+
+                            {/* Password fields... (keep existing password fields) */}
                             <div>
                                 <InputLabel htmlFor="password" value="Password" className="text-[#1B355E]" />
                                 <TextInput
