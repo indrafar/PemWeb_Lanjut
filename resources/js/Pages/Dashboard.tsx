@@ -4,7 +4,7 @@ import { Card } from "@/Components/ui/card";
 import { Search } from "lucide-react";
 import { SidebarProvider } from "@/Components/ui/sidebar";
 import { AppSidebar } from "@/Components/Appsidebar";
-import { Link } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import Calendar from "react-calendar";
 import {
   PieChart,
@@ -19,22 +19,32 @@ import {
 } from "recharts";
 import "../../css/calendar-custom.css";
 
-const pieData = [
-  { name: "In Progress", value: 10 },
-  { name: "Stuck", value: 3 },
-  { name: "Done", value: 7 },
-];
+interface Props {
+  stats: {
+    total: number;
+    inProgress: number;
+    stuck: number;
+    done: number;
+  };
+  chartData: Array<{
+    date: string;
+    tasks: number;
+  }>;
+}
 
-const barData = [
-  { date: "Jun 5", tasks: 2 },
-  { date: "Jun 6", tasks: 3 },
-  { date: "Jun 7", tasks: 5 },
-  { date: "Jun 8", tasks: 1 },
-];
+export default function Dashboard({ stats, chartData }: Props) {
+  const pieData = [
+    { name: "In Progress", value: stats.inProgress },
+    { name: "Stuck", value: stats.stuck },
+    { name: "Done", value: stats.done },
+  ];
 
-const COLORS = ["#F59E0B", "#EF4444", "#10B981"];
+  const COLORS = ["#F59E0B", "#EF4444", "#10B981"];
 
-export default function Dashboard() {
+  const navigateToTasks = (status?: string) => {
+    router.get(route("tasks.index", status ? { status } : {}));
+  };
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen bg-white text-[#1B355E]">
@@ -58,17 +68,29 @@ export default function Dashboard() {
 
           {/* Task Summary Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="bg-[#1B355E] text-white p-4 font-semibold w-full">
-              All Tasks: 20
+            <Card
+              className="bg-[#1B355E] text-white p-4 font-semibold w-full cursor-pointer hover:opacity-90"
+              onClick={() => navigateToTasks()}
+            >
+              All Tasks: {stats.total}
             </Card>
-            <Card className="bg-yellow-500 text-white p-4 font-semibold w-full">
-              In Progress: 10
+            <Card
+              className="bg-yellow-500 text-white p-4 font-semibold w-full cursor-pointer hover:opacity-90"
+              onClick={() => navigateToTasks("Working on it")}
+            >
+              In Progress: {stats.inProgress}
             </Card>
-            <Card className="bg-red-500 text-white p-4 font-semibold w-full">
-              Stuck: 3
+            <Card
+              className="bg-red-500 text-white p-4 font-semibold w-full cursor-pointer hover:opacity-90"
+              onClick={() => navigateToTasks("Stuck")}
+            >
+              Stuck: {stats.stuck}
             </Card>
-            <Card className="bg-green-600 text-white p-4 font-semibold w-full">
-              Done: 7
+            <Card
+              className="bg-green-600 text-white p-4 font-semibold w-full cursor-pointer hover:opacity-90"
+              onClick={() => navigateToTasks("Done")}
+            >
+              Done: {stats.done}
             </Card>
           </div>
 
@@ -105,7 +127,7 @@ export default function Dashboard() {
                 Tasks by Due Date
               </h2>
               <ResponsiveContainer width="100%" height={200}>
-                <BarChart data={barData}>
+                <BarChart data={chartData}>
                   <XAxis dataKey="date" />
                   <YAxis />
                   <Tooltip />
