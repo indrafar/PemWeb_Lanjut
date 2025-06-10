@@ -7,6 +7,8 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\ProjectTaskController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -39,18 +41,19 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('/tasks', function () {
-    return Inertia::render('Tasks');
-})->middleware(['auth', 'verified'])->name('tasks');
+Route::get('/tasks', [TaskController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('tasks');
+
+// Update Task
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::patch('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+});
 
 // Project Routes
 Route::middleware(['auth'])->group(function () {
-    Route::prefix('projects')->group(function () {
-        Route::get('/', [ProjectController::class, 'index'])->name('projects.index');
-        Route::post('/', [ProjectController::class, 'store'])->name('projects.store');
-        Route::put('/{project}', [ProjectController::class, 'update'])->name('projects.update');
-        Route::delete('/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
-    });
+    Route::resource('projects', ProjectController::class);
+    Route::resource('projects.tasks', ProjectTaskController::class);
 });
 
 Route::get('/notifications', function () {

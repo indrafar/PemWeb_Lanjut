@@ -3,7 +3,7 @@ import { SidebarContext } from '@/Components/ui/sidebar';
 import { Link, usePage } from '@inertiajs/react';
 import clsx from 'clsx';
 
-interface PageProps {
+interface MyPageProps {
   auth: {
     user: {
       role: string;
@@ -11,13 +11,17 @@ interface PageProps {
   };
 }
 
-export function AppSidebar() {
+type AppSidebarProps = {
+  search?: string;
+};
+
+export function AppSidebar({ search }: AppSidebarProps) {
   const context = useContext(SidebarContext);
   if (!context) throw new Error('AppSidebar must be used inside SidebarProvider');
 
   const { isOpen } = context;
   const { url } = usePage();
-  const { auth } = usePage<PageProps>().props;
+  const { auth } = usePage<any>().props; // <-- Ganti di sini
 
   const isAdmin = auth.user?.role === 'Admin';
 

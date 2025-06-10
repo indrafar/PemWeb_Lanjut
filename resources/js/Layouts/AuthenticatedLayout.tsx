@@ -1,4 +1,4 @@
-import { PropsWithChildren, ReactNode } from 'react';
+import { PropsWithChildren, ReactNode, useState } from 'react';
 import { usePage, Link } from '@inertiajs/react';
 import { SidebarProvider, SidebarTrigger } from '@/Components/ui/sidebar';
 import { AppSidebar } from '@/Components/Appsidebar';
@@ -16,20 +16,33 @@ export default function Authenticated({
   children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
   const user = usePage().props.auth.user;
+  const [search, setSearch] = useState("");
+
+  // Contoh: fungsi pencarian, bisa dihubungkan ke props, context, atau filter menu/sidebar
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+    // TODO: filter menu/sidebar/konten sesuai kebutuhan
+  };
 
   return (
     <SidebarProvider>
       <div className="flex min-h-screen">
-        <AppSidebar />
-
+        <AppSidebar search={search} />
         <div className="flex flex-col flex-1 p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
               <SidebarTrigger />
               {header && <div className="text-xl font-semibold text-gray-800">{header}</div>}
             </div>
-
             <div className="flex items-center gap-4">
+              {/* Search input */}
+              <input
+                type="text"
+                value={search}
+                onChange={handleSearch}
+                placeholder="Search..."
+                className="border rounded px-2 py-1 text-sm"
+              />
               <DropdownMenu>
                 <DropdownMenuTrigger
                   asChild

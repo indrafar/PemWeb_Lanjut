@@ -33,4 +33,10 @@ class Project extends Model
         return $this->belongsToMany(User::class, 'project_members')
                     ->wherePivot('user_id', '!=', $this->leader_id);
     }
+
+    public function tasks()
+    {
+        return $this->hasMany(\App\Models\Task::class, 'project_id');
+    }
+
 }

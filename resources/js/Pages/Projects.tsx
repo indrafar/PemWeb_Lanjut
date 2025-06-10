@@ -18,6 +18,16 @@ interface Project {
     description: string;
 }
 
+interface Task {
+    id: number;
+    name: string;
+    project: Project;
+    owner: string;
+    status: string;
+    due: string;
+    priority: string;
+}
+
 interface Props {
     projects: Project[];
     teamMembers: User[];
@@ -28,7 +38,7 @@ interface Props {
     };
 }
 
-const FormInput = ({ label, ...props }) => (
+const FormInput: React.FC<{ label: string } & React.InputHTMLAttributes<HTMLInputElement>> = ({ label, ...props }) => (
     <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
         <input
@@ -38,7 +48,7 @@ const FormInput = ({ label, ...props }) => (
     </div>
 );
 
-const FormSelect = ({ label, children, ...props }) => (
+const FormSelect: React.FC<{ label: string; children: React.ReactNode } & React.SelectHTMLAttributes<HTMLSelectElement>> = ({ label, children, ...props }) => (
     <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
         <select
@@ -49,6 +59,75 @@ const FormSelect = ({ label, children, ...props }) => (
         </select>
     </div>
 );
+
+function AddTaskForm({ projectId, onTaskAdded }: { projectId: number; onTaskAdded: () => void }) {
+    const { data, setData, post, processing, reset } = useForm({
+        name: '',
+        owner: '',
+        status: 'Not Started', // default harus sama dengan status di kanban/tabel
+        due_date: '',
+        priority: 'Low',
+    });
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        post(route('projects.tasks.store', projectId), {
+            onSuccess: () => {
+                reset();
+                if (onTaskAdded) onTaskAdded();
+            }
+        });
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="mt-2 flex flex-wrap gap-2">
+            <input name="name" value={data.name} onChange={(e) => setData('name', e.target.value)} placeholder="Task name" className="border px-2 py-1" required />
+            <input name="owner" value={data.owner} onChange={(e) => setData('owner', e.target.value)} placeholder="Owner" className="border px-2 py-1" />
+            <select name="status" value={data.status} onChange={(e) => setData('status', e.target.value)} className="border px-2 py-1">
+                <option value="Not Started">Not Started</option>
+                <option value="Working on it">Working on it</option>
+                <option value="Stuck">Stuck</option>
+                <option value="Done">Done</option>
+            </select>
+            <input name="due_date" type="date" value={data.due_date} onChange={(e) => setData('due_date', e.target.value)} className="border px-2 py-1" />
+            <select name="priority" value={data.priority} onChange={(e) => setData('priority', e.target.value)} className="border px-2 py-1">
+                <option>Low</option>
+                <option>Medium</option>
+                <option>High</option>
+            </select>
+            <button type="submit" disabled={processing} className="bg-blue-500 text-white px-3 py-1 rounded">Add Task</button>
+        </form>
+    );
+}
+
+function TableComponent({ tasks = [] }: { tasks?: Task[] }) {
+    return (
+        <table>
+            <thead>
+                <tr>
+                    <th>Task</th>
+                    <th>Project</th>
+                    <th>Owner</th>
+                    <th>Status</th>
+                    <th>Due Date</th>
+                    <th>Priority</th>
+                </tr>
+            </thead>
+            <tbody>
+                {Array.isArray(tasks) && tasks.map((task, idx) => (
+                    <tr key={task.id}>
+                        <td>{task.name}</td>
+                        <td>{task.project?.name ?? '-'}</td>
+                        <td>{task.owner}</td>
+                        <td>{task.status}</td>
+                        <td>{task.due}</td>
+                        <td>{task.priority}</td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    );
+}
 
 export default function Projects({ projects, teamMembers, can }: Props) {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -63,7 +142,7 @@ export default function Projects({ projects, teamMembers, can }: Props) {
         description: ''
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         
         if (editingProject) {
@@ -149,6 +228,7 @@ export default function Projects({ projects, teamMembers, can }: Props) {
                                     </p>
                                 </div>
                             </div>
+                            <AddTaskForm projectId={project.id} onTaskAdded={() => {}} />
                             {(can.edit || can.delete) && (
                                 <div className="mt-4 flex justify-end space-x-2">
                                     {can.edit && (
@@ -214,14 +294,14 @@ export default function Projects({ projects, teamMembers, can }: Props) {
                                             label="Project Name"
                                             type="text"
                                             value={data.name}
-                                            onChange={e => setData('name', e.target.value)}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('name', e.target.value)}
                                             required
                                         />
 
                                         <FormSelect
                                             label="Status"
                                             value={data.status}
-                                            onChange={e => setData('status', e.target.value)}
+                                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setData('status', e.target.value)}
                                         >
                                             <option value="Active">Active</option>
                                             <option value="Completed">Completed</option>
@@ -231,7 +311,7 @@ export default function Projects({ projects, teamMembers, can }: Props) {
                                         <FormSelect
                                             label="Project Leader"
                                             value={data.leader_id}
-                                            onChange={e => setData('leader_id', e.target.value)}
+                                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setData('leader_id', e.target.value)}
                                             required
                                         >
                                             <option value="">Select Leader</option>
@@ -248,7 +328,7 @@ export default function Projects({ projects, teamMembers, can }: Props) {
                                             label="Deadline"
                                             type="date"
                                             value={data.deadline}
-                                            onChange={e => setData('deadline', e.target.value)}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setData('deadline', e.target.value)}
                                             required
                                         />
                                     </div>
@@ -268,7 +348,7 @@ export default function Projects({ projects, teamMembers, can }: Props) {
                                                                 type="checkbox"
                                                                 value={user.id}
                                                                 checked={data.member_ids.includes(user.id)}
-                                                                onChange={(e) => {
+                                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                                                     const newMemberIds = e.target.checked
                                                                         ? [...data.member_ids, user.id]
                                                                         : data.member_ids.filter(id => id !== user.id);
@@ -288,7 +368,7 @@ export default function Projects({ projects, teamMembers, can }: Props) {
                                             </label>
                                             <textarea
                                                 value={data.description}
-                                                onChange={e => setData('description', e.target.value)}
+                                                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setData('description', e.target.value)}
                                                 rows={5}
                                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                                 required
