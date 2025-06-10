@@ -10,6 +10,7 @@ use App\Http\Controllers\ProjectController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
 // Route root: redirect to login (hapus duplikat)
 Route::get('/', function () {
@@ -45,12 +46,10 @@ Route::get('/tasks', function () {
 
 // Project Routes
 Route::middleware(['auth'])->group(function () {
-    Route::prefix('projects')->group(function () {
-        Route::get('/', [ProjectController::class, 'index'])->name('projects.index');
-        Route::post('/', [ProjectController::class, 'store'])->name('projects.store');
-        Route::put('/{project}', [ProjectController::class, 'update'])->name('projects.update');
-        Route::delete('/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
-    });
+    Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
+    Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
+    Route::put('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
+    Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
 });
 
 Route::get('/notifications', function () {
@@ -76,3 +75,9 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
 // Route login/register bawaan Laravel Breeze (atau Jetstream, dll)
 require __DIR__.'/auth.php';
+
+Route::middleware('guest')->group(function () {
+    Route::get('login', [AuthenticatedSessionController::class, 'create'])
+        ->name('login');
+    Route::post('login', [AuthenticatedSessionController::class, 'store']);
+});

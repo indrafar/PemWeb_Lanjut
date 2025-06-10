@@ -20,7 +20,8 @@ interface Project {
 
 interface Props {
     projects: Project[];
-    teamMembers: User[];
+    teamMembers: User[]; // These are the Manajer Proyek
+    teamMembersList: User[]; // These are the Anggota Tim
     can: {
         create: boolean;
         edit: boolean;
@@ -50,7 +51,7 @@ const FormSelect = ({ label, children, ...props }) => (
     </div>
 );
 
-export default function Projects({ projects, teamMembers, can }: Props) {
+export default function Projects({ projects, teamMembers, teamMembersList, can }: Props) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingProject, setEditingProject] = useState<Project | null>(null);
 
@@ -72,6 +73,9 @@ export default function Projects({ projects, teamMembers, can }: Props) {
                     setIsModalOpen(false);
                     reset();
                     setEditingProject(null);
+                },
+                onError: (errors) => {
+                    console.error('Error updating project:', errors);
                 }
             });
         } else {
@@ -79,6 +83,9 @@ export default function Projects({ projects, teamMembers, can }: Props) {
                 onSuccess: () => {
                     setIsModalOpen(false);
                     reset();
+                },
+                onError: (errors) => {
+                    console.error('Error creating project:', errors);
                 }
             });
         }
@@ -88,12 +95,11 @@ export default function Projects({ projects, teamMembers, can }: Props) {
         if (confirm('Are you sure you want to delete this project?')) {
             router.delete(route('projects.destroy', projectId), {
                 onSuccess: () => {
-                    // Optional: Show success message
+                    // Handle successful deletion
                 },
                 onError: (errors) => {
-                    // Optional: Handle errors
-                    alert('Failed to delete project');
-                },
+                    console.error('Error deleting project:', errors);
+                }
             });
         }
     };
@@ -235,13 +241,11 @@ export default function Projects({ projects, teamMembers, can }: Props) {
                                             required
                                         >
                                             <option value="">Select Leader</option>
-                                            {teamMembers
-                                                .filter(user => ['Admin', 'Manajer Proyek'].includes(user.role))
-                                                .map(user => (
-                                                    <option key={user.id} value={user.id}>
-                                                        {user.name}
-                                                    </option>
-                                                ))}
+                                            {teamMembers.map(user => (
+                                                <option key={user.id} value={user.id}>
+                                                    {user.name}
+                                                </option>
+                                            ))}
                                         </FormSelect>
 
                                         <FormInput
@@ -260,25 +264,23 @@ export default function Projects({ projects, teamMembers, can }: Props) {
                                                 Team Members
                                             </label>
                                             <div className="border border-gray-300 rounded-md p-2 max-h-32 overflow-y-auto">
-                                                {teamMembers
-                                                    .filter(user => user.role === 'Anggota Tim')
-                                                    .map(user => (
-                                                        <label key={user.id} className="flex items-center p-2 hover:bg-gray-50">
-                                                            <input
-                                                                type="checkbox"
-                                                                value={user.id}
-                                                                checked={data.member_ids.includes(user.id)}
-                                                                onChange={(e) => {
-                                                                    const newMemberIds = e.target.checked
-                                                                        ? [...data.member_ids, user.id]
-                                                                        : data.member_ids.filter(id => id !== user.id);
-                                                                    setData('member_ids', newMemberIds);
-                                                                }}
-                                                                className="rounded border-gray-300 text-blue-600"
-                                                            />
-                                                            <span className="ml-2 text-sm text-gray-700">{user.name}</span>
-                                                        </label>
-                                                    ))}
+                                                {teamMembersList.map(user => (
+                                                    <label key={user.id} className="flex items-center p-2 hover:bg-gray-50">
+                                                        <input
+                                                            type="checkbox"
+                                                            value={user.id}
+                                                            checked={data.member_ids.includes(user.id)}
+                                                            onChange={(e) => {
+                                                                const newMemberIds = e.target.checked
+                                                                    ? [...data.member_ids, user.id]
+                                                                    : data.member_ids.filter(id => id !== user.id);
+                                                                setData('member_ids', newMemberIds);
+                                                            }}
+                                                            className="rounded border-gray-300 text-blue-600"
+                                                        />
+                                                        <span className="ml-2 text-sm text-gray-700">{user.name}</span>
+                                                    </label>
+                                                ))}
                                             </div>
                                         </div>
 

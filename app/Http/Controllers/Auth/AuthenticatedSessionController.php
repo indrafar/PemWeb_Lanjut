@@ -24,21 +24,27 @@ class AuthenticatedSessionController extends Controller
 
         public function store(LoginRequest $request): RedirectResponse
         {
-            $request->authenticate();
-            $request->session()->regenerate();
+            try {
+                $request->authenticate();
+                $request->session()->regenerate();
 
-            $user = Auth::user();
-            
-            // Redirect based on user role
-            switch ($user->role) {
-                case 'Admin':
-                    return redirect()->route('dashboard')->with('message', 'Welcome Admin');
-                case 'Manajer Proyek':
-                    return redirect()->route('projects')->with('message', 'Welcome Project Manager');
-                case 'Anggota Tim':
-                    return redirect()->route('tasks')->with('message', 'Welcome Team Member');
-                default:
-                    return redirect()->route('dashboard');
+                $user = Auth::user();
+                
+                // Redirect based on user role
+                switch ($user->role) {
+                    case 'Admin':
+                        return redirect()->route('dashboard')->with('message', 'Welcome Admin');
+                    case 'Manajer Proyek':
+                        return redirect()->route('projects')->with('message', 'Welcome Project Manager');
+                    case 'Anggota Tim':
+                        return redirect()->route('tasks')->with('message', 'Welcome Team Member');
+                    default:
+                        return redirect()->route('dashboard');
+                }
+            } catch (\Exception $e) {
+                return back()->withErrors([
+                    'email' => 'The provided credentials do not match our records.',
+                ]);
             }
         }
 
