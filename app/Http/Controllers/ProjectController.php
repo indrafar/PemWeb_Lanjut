@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ProjectController extends Controller
 {
     private function checkIfAdmin()
     {
-        if (auth()->user()->role !== 'Admin') {
+        if (Auth::user()->role !== 'Admin') {
             abort(403, 'Unauthorized action.');
         }
         return true;
@@ -18,7 +19,7 @@ class ProjectController extends Controller
 
     private function checkIfManagerOrAdmin()
     {
-        if (!in_array(auth()->user()->role, ['Admin', 'Manajer Proyek'])) {
+        if (!in_array(Auth::user()->role, ['Admin', 'Manajer Proyek'])) {
             abort(403, 'Unauthorized action.');
         }
         return true;
@@ -27,10 +28,9 @@ class ProjectController extends Controller
     public function index()
     {
         try {
-            $userRole = auth()->user()->role;
+            $userRole = Auth::user()->role;
             $projects = Project::with(['leader', 'members'])->get();
-            
-            // Get appropriate team members based on role
+
             $teamMembers = User::where('role', 'Manajer Proyek')->get();
             $teamMembersList = User::where('role', 'Anggota Tim')->get();
 
@@ -51,33 +51,27 @@ class ProjectController extends Controller
 
     public function store(Request $request)
     {
-        try {
-            $this->checkIfManagerOrAdmin();
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'status' => 'required|in:Pending,Active,Completed',
+            'deadline' => 'required|date',
+            'leader_id' => 'required|exists:users,id',
+            'member_ids' => 'array',
+            'member_ids.*' => 'exists:users,id',
+            'description' => 'required|string',
+        ]);
 
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'status' => 'required|in:Active,Completed,Pending',
-                'deadline' => 'required|date',
-                'leader_id' => 'required|exists:users,id',
-                'member_ids' => 'required|array',
-                'member_ids.*' => 'exists:users,id',
-                'description' => 'required|string'
-            ]);
+        $project = Project::create([
+            'name' => $validated['name'],
+            'status' => $validated['status'],
+            'deadline' => $validated['deadline'],
+            'leader_id' => $validated['leader_id'],
+            'description' => $validated['description'],
+        ]);
 
-            $project = Project::create([
-                'name' => $validated['name'],
-                'status' => $validated['status'],
-                'deadline' => $validated['deadline'],
-                'leader_id' => $validated['leader_id'],
-                'description' => $validated['description'],
-            ]);
+        $project->members()->sync($validated['member_ids']);
 
-            $project->members()->attach($validated['member_ids']);
-
-            return redirect()->back()->with('message', 'Project created successfully');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error creating project: ' . $e->getMessage());
-        }
+        return redirect()->back()->with('success', 'Project created successfully.');
     }
 
     public function update(Request $request, Project $project)

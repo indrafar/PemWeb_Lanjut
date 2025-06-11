@@ -40,7 +40,11 @@ export default function Login({ status, canResetPassword }: { status?: string; c
             <div className="absolute inset-0 bg-black/60"></div>
             {/* Logo di atas overlay */}
         <div className="relative z-10 flex items-center justify-center h-full">
+<<<<<<< HEAD
             <img src="/images/logonoted.png" alt="Logo" className="w-40 h-auto" />
+=======
+            <img src="/images/logonoted2.png" alt="Logo" className="w-40 h-auto" />
+>>>>>>> e3e56496c3b4a133dbe121c6bf8de8f428cf8ef2
         </div>
         </div>
         {/* Status Message */}

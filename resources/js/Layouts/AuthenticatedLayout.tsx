@@ -25,7 +25,7 @@ export default function Authenticated({
         <div className="flex flex-col flex-1 p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
-              <SidebarTrigger />
+
               {header && <div className="text-xl font-semibold text-gray-800">{header}</div>}
             </div>
 

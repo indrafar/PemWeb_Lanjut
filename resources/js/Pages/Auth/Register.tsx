@@ -37,7 +37,7 @@ export default function Register() {
                         />
                         <div className="absolute inset-0 bg-black/60"></div>
                         <div className="relative z-10 flex items-center justify-center h-full">
-                            <img src="/PemWeb_Lanjut/public/images/logonoted.png" alt="Logo" className="w-40 h-auto" />
+                            <img src="/images/logonoted2.png" alt="Logo" className="w-40 h-auto" />
                         </div>
                     </div>
 

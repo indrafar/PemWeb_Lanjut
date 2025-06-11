@@ -1,4 +1,5 @@
-export type TaskStatus = "Working on it" | "Done" | "Stuck";
+export type TaskStatus = "Not Started" | "Working on it" | "Done" | "Stuck";
+
 
 export interface Task {
   id: number;
@@ -18,4 +19,6 @@ export interface Task {
   notes: string;
   timeline_start: string;
   timeline_end: string;
+  priority?: 'Low' | 'Medium' | 'High'; 
+  description?: string;
 }

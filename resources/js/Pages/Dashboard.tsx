@@ -4,6 +4,7 @@ import { Card } from "@/Components/ui/card";
 import { Search } from "lucide-react";
 import { SidebarProvider } from "@/Components/ui/sidebar";
 import { AppSidebar } from "@/Components/Appsidebar";
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Link, router } from "@inertiajs/react";
 import Calendar from "react-calendar";
 import {
@@ -46,25 +47,11 @@ export default function Dashboard({ stats, chartData }: Props) {
   };
 
   return (
+    <AuthenticatedLayout>
     <SidebarProvider>
       <div className="flex min-h-screen bg-white text-[#1B355E]">
-        <AppSidebar />
+
         <div className="flex flex-col flex-1 p-4 sm:p-6 space-y-6 overflow-auto">
-          {/* Top bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="relative w-full sm:w-1/2">
-              <Input
-                placeholder="Search"
-                className="pl-10 rounded-full text-[#1B355E] bg-white w-full"
-              />
-              <Search className="absolute top-2.5 left-3 w-4 h-4 text-[#1B355E]" />
-            </div>
-            <Link href="/profile" className="w-full sm:w-auto">
-              <Button className="rounded-full bg-white text-[#1B355E] px-6 py-1 w-full sm:w-auto">
-                Profile
-              </Button>
-            </Link>
-          </div>
 
           {/* Task Summary Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -180,5 +167,6 @@ export default function Dashboard({ stats, chartData }: Props) {
         </div>
       </div>
     </SidebarProvider>
+    </AuthenticatedLayout>
   );
 }

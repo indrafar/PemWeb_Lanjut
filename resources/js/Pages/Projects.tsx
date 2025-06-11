@@ -1,4 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { SidebarProvider } from "@/Components/ui/sidebar";
+import { AppSidebar } from "@/Components/Appsidebar";
 import { Head, useForm, router } from '@inertiajs/react'; // Add router import
 import { useState } from 'react';
 
@@ -116,6 +118,7 @@ export default function Projects({ projects, teamMembers, teamMembersList, can }
     return (
         <AuthenticatedLayout>
             <Head title="Projects" />
+                
             <div className="p-6 bg-white min-h-screen">
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-3xl font-bold">Project Dashboard</h1>
