@@ -6,6 +6,7 @@ use App\Models\Task;
 use App\Models\User;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
@@ -13,19 +14,26 @@ class TaskController extends Controller
 {
     private function checkIfProjectManager()
     {
-        if (!in_array(auth()->user()->role, ['Admin', 'Manajer Proyek'])) {
+        $user = Auth::user();
+        if (!in_array($user->role, ['Admin', 'Manajer Proyek'])) {
             abort(403, 'Unauthorized action.');
         }
     }
 
+    private function canUpdateTask(Task $task)
+    {
+        $user = Auth::user();
+        return $user->role === 'Admin' ||
+               $user->role === 'Manajer Proyek' ||
+               ($user->role === 'Anggota Tim' && $task->assigned_to === $user->id);
+    }
+
     public function index()
     {
-        $user = auth()->user();
-        
+        $user = Auth::user();
+
         $tasks = Task::with(['project', 'owner', 'assignedTo', 'comments.user'])
-            ->when($user->role === 'Anggota Tim', function($query) use ($user) {
-                return $query->where('assigned_to', $user->id);
-            })
+            ->when($user->role === 'Anggota Tim', fn($query) => $query->where('assigned_to', $user->id))
             ->get();
 
         return Inertia::render('Tasks', [
@@ -56,10 +64,9 @@ class TaskController extends Controller
                 'timeline_end' => 'required|date|after_or_equal:timeline_start'
             ]);
 
-            $task = Task::create([
-                ...$validated,
-                'owner_id' => auth()->id()
-            ]);
+            Task::create(array_merge($validated, [
+                'owner_id' => Auth::id()
+            ]));
 
             return redirect()->back()->with('success', 'Task created successfully');
         } catch (\Exception $e) {
@@ -76,12 +83,9 @@ class TaskController extends Controller
 
     public function update(Request $request, Task $task)
     {
-        $user = auth()->user();
-        
-        // Check if user can update this task
-        if (!($user->role === 'Admin' || 
-            $user->role === 'Manajer Proyek' || 
-            ($user->role === 'Anggota Tim' && $task->assigned_to === $user->id))) {
+        $user = Auth::user();
+
+        if (!$this->canUpdateTask($task)) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -101,7 +105,7 @@ class TaskController extends Controller
 
             return redirect()->back()->with('success', 'Task updated successfully');
         } catch (\Exception $e) {
-            \Log::error('Task update failed', [
+            Log::error('Task update failed', [
                 'error' => $e->getMessage(),
                 'task_id' => $task->id,
                 'request' => $request->all()
@@ -116,7 +120,7 @@ class TaskController extends Controller
     public function destroy(Task $task)
     {
         $this->checkIfProjectManager();
-        
+
         $task->delete();
 
         return redirect()->back()->with('message', 'Task deleted successfully');
@@ -128,8 +132,9 @@ class TaskController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        $newStatus = $task->status === 'Done' ? 'Working on it' : 'Done';
-        $task->update(['status' => $newStatus]);
+        $task->update([
+            'status' => $task->status === 'Done' ? 'Working on it' : 'Done'
+        ]);
 
         return redirect()->back()->with('message', 'Task status updated successfully');
     }
