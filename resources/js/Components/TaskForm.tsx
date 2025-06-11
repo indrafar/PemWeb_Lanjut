@@ -1,12 +1,12 @@
+import { Task, TaskStatus } from "@/types/task";
 import { useForm } from "@inertiajs/react";
-import { FormEvent } from "react";
+import { FormEvent, ChangeEvent } from "react";
 
-interface Task {
-  id: number;
+type FormData = {
   title: string;
-  project_id: number;
-  assigned_to: number;
-  status: "Working on it" | "Done" | "Stuck";
+  project_id: string;
+  assigned_to: string;
+  status: TaskStatus;
   due_date: string;
   notes: string;
   timeline_start: string;
@@ -14,7 +14,7 @@ interface Task {
 }
 
 interface Props {
-  task?: Task;
+  task: Task | null | undefined;
   projects: Array<{ id: number; name: string }>;
   teamMembers: Array<{ id: number; name: string }>;
   onClose: () => void;
@@ -31,6 +31,14 @@ export default function TaskForm({ task, projects, teamMembers, onClose }: Props
     timeline_start: task?.timeline_start || new Date().toISOString().split('T')[0],
     timeline_end: task?.timeline_end || new Date().toISOString().split('T')[0],
   });
+
+  const handleChange = (key: keyof FormData, value: string) => {
+    setData(key, value);
+  };
+
+  const handleStatusChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setData("status", e.target.value as TaskStatus);
+  };
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -61,7 +69,7 @@ export default function TaskForm({ task, projects, teamMembers, onClose }: Props
         <input
           type="text"
           value={data.title}
-          onChange={(e) => setData("title", e.target.value)}
+          onChange={(e) => handleChange("title", e.target.value)}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         />
         {errors.title && (
@@ -107,7 +115,7 @@ export default function TaskForm({ task, projects, teamMembers, onClose }: Props
         <label className="block text-sm font-medium text-gray-700">Status</label>
         <select
           value={data.status}
-          onChange={(e) => setData("status", e.target.value)}
+          onChange={handleStatusChange}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         >
           <option value="Working on it">Working on it</option>

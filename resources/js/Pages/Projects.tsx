@@ -29,7 +29,16 @@ interface Props {
     };
 }
 
-const FormInput = ({ label, ...props }) => (
+interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+    label: string;
+}
+
+interface FormSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+    label: string;
+    children: React.ReactNode;
+}
+
+const FormInput = ({ label, ...props }: FormInputProps) => (
     <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
         <input
@@ -39,7 +48,7 @@ const FormInput = ({ label, ...props }) => (
     </div>
 );
 
-const FormSelect = ({ label, children, ...props }) => (
+const FormSelect = ({ label, children, ...props }: FormSelectProps) => (
     <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
         <select
