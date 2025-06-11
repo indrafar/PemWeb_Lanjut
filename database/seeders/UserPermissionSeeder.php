@@ -12,7 +12,36 @@ class UserPermissionSeeder extends Seeder
 {
     // Inisiasi permission
     private $permissions = [
-        'role',
+        'manage-users',
+        'manage-projects',
+        'manage-tasks',
+        'view-tasks',
+        'create-tasks',
+        'edit-tasks',
+        'delete-tasks',
+    ];
+
+    private $roles = [
+        'Admin' => [
+            'manage-users',
+            'manage-projects',
+            'manage-tasks',
+            'view-tasks',
+            'create-tasks',
+            'edit-tasks',
+            'delete-tasks',
+        ],
+        'Manajer Proyek' => [
+            'manage-projects',
+            'manage-tasks',
+            'view-tasks',
+            'create-tasks',
+            'edit-tasks',
+        ],
+        'Anggota Tim' => [
+            'view-tasks',
+            'create-tasks',
+        ],
     ];
 
     /**
@@ -27,26 +56,54 @@ class UserPermissionSeeder extends Seeder
             Permission::create(['name' => $permission]);
         }
 
+        // Membuat role
+        foreach ($this->roles as $roleName => $permissions) {
+            $role = Role::create(['name' => $roleName]);
+            $role->syncPermissions($permissions);
+        }
+
         // Membuat user
-        $user = User::create([
-            'name' => 'gober',
-            'username' => 'indra',
-            'email' => 'indrafar@gmail.com',
-            'password' => Hash::make('1122334')
+        $adminUser = User::create([
+            'name' => 'Admin',
+            'username' => 'admin',
+            'email' => 'admin@admin.com',
+            'password' => Hash::make('password'),
+            'role' => 'Admin'
         ]);
 
-        // Membuat role
-        $role = Role::create(['name' => 'Superadmin']);
+        $managerUser = User::create([
+            'name' => 'Indra Farhan',
+            'username' => 'Indra',
+            'email' => 'Indra@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'Manajer Proyek'
+        ]);
 
-        // Mengambil semua permissions
-        $permissions = Permission::pluck('id', 'id')->all();
-
-        // Sinkronisasi permissions ke role
-        $role->syncPermissions($permissions);
+        $memberUser = User::create([
+            'name' => 'Reza',
+            'username' => 'Reza',
+            'email' => 'Reza@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'Anggota Tim'
+        ]);
+        $memberUser = User::create([
+            'name' => 'Khai',
+            'username' => 'Khai',
+            'email' => 'Khai@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'Anggota Tim'
+        ]);
+        $memberUser = User::create([
+            'name' => 'Rafly',
+            'username' => 'Rafly',
+            'email' => 'Rafly@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'Anggota Tim'
+        ]);
 
         // Assign role ke user
-        if ($user && $role) {
-            $user->assignRole([$role->name]);
-        }
+        $adminUser->assignRole('Admin');
+        $managerUser->assignRole('Manajer Proyek');
+        $memberUser->assignRole('Anggota Tim');
     }
 }

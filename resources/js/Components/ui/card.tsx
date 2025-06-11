@@ -1,10 +1,19 @@
 // resources/js/Components/ui/card.tsx
-import { ReactNode } from 'react';
+import { HTMLAttributes, ReactNode } from 'react';
+import { cn } from '@/lib/utils';
 
-export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
-    return (
-        <div className={`rounded-lg shadow-md p-4 ${className}`}>
-            {children}
-        </div>
-    );
+interface CardProps extends HTMLAttributes<HTMLDivElement> {
+  children: ReactNode;
+  className?: string;
+}
+
+export function Card({ className, children, ...props }: CardProps) {
+  return (
+    <div
+      className={cn('rounded-lg border bg-card text-card-foreground shadow-sm', className)}
+      {...props}
+    >
+      {children}
+    </div>
+  );
 }

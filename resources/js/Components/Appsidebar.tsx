@@ -1,53 +1,96 @@
 import React, { useContext } from 'react';
-import { SidebarContext } from '@/Components/ui/sidebar'; 
+import { SidebarContext } from '@/Components/ui/sidebar';
 import { Link, usePage } from '@inertiajs/react';
+import {
+  LucideLayoutDashboard,
+  LucideListChecks,
+  LucideFolder,
+  LucideUsers,
+  LucideTrash2,
+  LucideChevronLeft,
+  LucideChevronRight,
+  LucideBell,
+} from 'lucide-react';
 import clsx from 'clsx';
 
 export function AppSidebar() {
   const context = useContext(SidebarContext);
   if (!context) throw new Error('AppSidebar must be used inside SidebarProvider');
 
-  const { isOpen } = context;
-  const { url } = usePage();
+  const { isOpen, toggle } = context;
+  const { url, props } = usePage();
+  const userRole = (props.auth?.user as any)?.role;
+  const isAdmin = userRole === 'Admin';
 
   const navItems = [
-    { name: 'Dashboard', href: '/dashboard' },
-    { name: 'Task', href: '/tasks' },
-    { name: 'Projects', href: '/projects' },
-    { name: 'Notifications', href: '/notifications' },
-    { name: 'Roles', href: '/roles' },
-    { name: 'Trash', href: '/trash' },
+    { name: 'Dashboard', href: '/dashboard', icon: LucideLayoutDashboard },
+    { name: 'Task', href: '/tasks', icon: LucideListChecks },
+    { name: 'Projects', href: '/projects', icon: LucideFolder },
+    ...(isAdmin ? [{ name: 'Manage Users', href: '/manage-users', icon: LucideUsers }] : []),
+    { name: 'Notifications', href: '/notifications', icon: LucideBell }, // ← tambahkan ini
+    { name: 'Trash', href: '/trash', icon: LucideTrash2 },
   ];
 
-  if (!isOpen) return null;
 
   return (
-    <aside className="w-64 h-screen p-4 shadow" style={{ backgroundColor: '#A1B6D9' }}>
-      {/* Logo di atas */}
-      <div className="mb-6 flex items-center justify-center">
-        <img 
-          src="/images/logonoted.png" 
-          alt="Logo" 
-          className="h-12 w-auto select-none" 
+    <aside
+      className={clsx(
+        'relative h-screen p-4 transition-all duration-300 shadow-md flex flex-col items-center',
+        isOpen ? 'w-64' : 'w-20',
+        'bg-[#1B355E] text-white'
+      )}
+    >
+      {/* Toggle button fixed to the right side */}
+      <button
+        onClick={toggle}
+        className="absolute -right-3 top-4 bg-white border rounded-full p-1 shadow hover:bg-gray-100 z-20"
+      >
+        {isOpen ? <LucideChevronLeft size={18} /> : <LucideChevronRight size={18} />}
+      </button>
+
+
+      {/* Logo and Text Side by Side */}
+      <div className="mb-8 flex items-center justify-center gap-2">
+        <img
+          src="/images/logonoted.png"
+          alt="Logo"
+          className={clsx('select-none', isOpen ? 'h-12' : 'h-10')}
           draggable={false}
         />
+        {isOpen && (
+          <span
+            className="text-3xl font-extrabold tracking-wide"
+            style={{ fontFamily: 'Montserrat' }}
+          >
+            NOTED
+          </span>
+        )}
       </div>
 
-      <nav className="space-y-2">
-        {navItems.map((item) => {
-          const isActive = url.startsWith(item.href);
+
+      {/* Navigation */}
+      <nav className="space-y-2 w-full flex-1">
+        {navItems.map(({ name, href, icon: Icon }) => {
+          const isActive = url.startsWith(href);
           return (
             <Link
-              key={item.href}
-              href={item.href}
+              key={href}
+              href={href}
               className={clsx(
-                'block px-4 py-2 rounded transition-colors',
+                'flex items-center gap-4 px-4 py-2 rounded-md transition-colors group relative',
                 isActive
-                  ? 'bg-[#1B355E] font-semibold text-white'  // aktif: background gelap, teks putih
-                  : 'text-[#1B355E] hover:bg-[#335DA2] hover:text-white'  // non aktif: teks #1B355E, hover bg & teks terang
+                  ? 'bg-white text-[#1B355E] font-semibold'
+                  : 'hover:bg-white hover:text-[#1B355E] text-white'
               )}
             >
-              {item.name}
+              <Icon size={20} />
+              {isOpen ? (
+                <span>{name}</span>
+              ) : (
+                <span className="sr-only group-hover:not-sr-only absolute left-full ml-2 whitespace-nowrap bg-white px-2 py-1 text-sm text-[#1B355E] rounded shadow-md z-10">
+                  {name}
+                </span>
+              )}
             </Link>
           );
         })}

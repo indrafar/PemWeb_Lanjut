@@ -6,7 +6,7 @@ import path from 'path';
 export default defineConfig({
   plugins: [
     laravel({
-      input: ['resources/js/app.tsx'], // file utama js/tsx kamu
+      input: ['resources/js/app.tsx'],
       refresh: true,
     }),
     react(),
@@ -16,4 +16,11 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'resources/js'),
     },
   },
+  server: {
+    host: '127.0.0.1',
+    port: 8000,
+    hmr: {
+      host: '127.0.0.1'
+    },
+  }
 });

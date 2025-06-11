@@ -23,13 +23,5 @@ export function SidebarTrigger() {
   const context = useContext(SidebarContext);
   if (!context) throw new Error('SidebarTrigger must be used inside SidebarProvider');
 
-  return (
-    <button
-      onClick={context.toggle}
-      className="px-4 py-2 bg-blue-500 text-white rounded"
-      aria-label="Toggle Sidebar"
-    >
-      Toggle Sidebar
-    </button>
-  );
+
 }
