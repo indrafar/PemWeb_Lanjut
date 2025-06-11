@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Task;
@@ -10,7 +11,7 @@ class DashboardController extends Controller
     public function index()
     {
         $user = auth()->user();
-        
+
         // Get task counts based on status
         $taskCounts = Task::when($user->role === 'Anggota Tim', function($query) use ($user) {
             return $query->where('assigned_to', $user->id);
@@ -23,7 +24,7 @@ class DashboardController extends Controller
         ')
         ->first();
 
-        // Get tasks by due date for chart
+        // Tasks by due date
         $tasksByDueDate = Task::when($user->role === 'Anggota Tim', function($query) use ($user) {
             return $query->where('assigned_to', $user->id);
         })
@@ -33,14 +34,33 @@ class DashboardController extends Controller
         ->limit(7)
         ->get();
 
+        // Overdue tasks (due_date < today & not done)
+        $overdueTasks = Task::when($user->role === 'Anggota Tim', function($query) use ($user) {
+            return $query->where('assigned_to', $user->id);
+        })
+        ->where('due_date', '<', now())
+        ->where('status', '!=', 'Done')
+        ->get(['id', 'title', 'due_date']);
+
+        // Tasks by owner
+        $tasksByOwner = Task::when($user->role === 'Anggota Tim', function($query) use ($user) {
+            return $query->where('assigned_to', $user->id);
+        }, function($query) {
+            return $query->selectRaw('users.name as owner_name, COUNT(*) as tasks_count')
+                         ->join('users', 'tasks.assigned_to', '=', 'users.id')
+                         ->groupBy('users.name');
+        })->get();
+
         return Inertia::render('Dashboard', [
             'stats' => [
-                'total' => $taskCounts->total,
-                'inProgress' => $taskCounts->in_progress,
-                'stuck' => $taskCounts->stuck,
-                'done' => $taskCounts->done
+                'total' => $taskCounts->total ?? 0,
+                'inProgress' => $taskCounts->in_progress ?? 0,
+                'stuck' => $taskCounts->stuck ?? 0,
+                'done' => $taskCounts->done ?? 0
             ],
-            'chartData' => $tasksByDueDate
+            'chartData' => $tasksByDueDate,
+            'overdueTasks' => $overdueTasks,
+            'tasksByOwner' => $tasksByOwner
         ]);
     }
 }

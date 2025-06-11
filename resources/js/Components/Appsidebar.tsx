@@ -49,12 +49,13 @@ export function AppSidebar() {
       )}
     >
       {/* Toggle button fixed to the right side */}
-      <button
-        onClick={toggle}
-        className="absolute -right-3 top-4 bg-white border rounded-full p-1 shadow hover:bg-gray-100 z-20"
-      >
-        {isOpen ? <LucideChevronLeft size={18} /> : <LucideChevronRight size={18} />}
-      </button>
+    <button
+      onClick={toggle}
+      className="absolute -right-3 top-4 bg-white border rounded-full p-1 shadow hover:bg-gray-100 z-20"
+    >
+      {/* Tambahkan kelas text-blue-600 di sini */}
+      {isOpen ? <LucideChevronLeft size={18} className="text-blue-600" /> : <LucideChevronRight size={18} className="text-blue-600" />}
+    </button>
 
 
       {/* Logo and Text Side by Side */}

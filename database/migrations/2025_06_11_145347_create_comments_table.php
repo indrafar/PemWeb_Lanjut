@@ -7,21 +7,18 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Jalankan migrasi.
+     * Run the migrations.
      */
     public function up(): void
     {
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Komentar dibuat oleh user
-            $table->foreignId('task_id')->constrained()->onDelete('cascade'); // Komentar milik sebuah task
-            $table->text('content'); // Konten komentar
             $table->timestamps();
         });
     }
 
     /**
-     * Jalankan rollback migrasi.
+     * Reverse the migrations.
      */
     public function down(): void
     {

@@ -10,6 +10,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Task extends Model
 {
     use SoftDeletes;
+
+    // ✅ Simpan di dalam class
+    public const STATUSES = [
+        'Not Started' => 'Not Started',
+        'Working on it' => 'Working on it',
+        'Stuck' => 'Stuck',
+        'Done' => 'Done',
+    ];
+
     protected $fillable = [
         'title',
         'project_id',
@@ -45,8 +54,9 @@ class Task extends Model
         return $this->belongsTo(User::class, 'assigned_to');
     }
 
-     public function comments(): HasMany
+    public function comments(): HasMany
     {
         return $this->hasMany(Comment::class)->latest();
     }
+
 }

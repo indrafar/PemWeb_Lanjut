@@ -1,7 +1,5 @@
 <?php
 
-
-
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -11,6 +9,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TrashController;
+use App\Http\Controllers\CalendarController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -27,9 +26,14 @@ Route::middleware('guest')->group(function () {
 });
 
 // Authenticated Routes
-Route::middleware(['auth', 'verified'])->group(function () {
-    // Dashboard
+Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+
+    Route::get('/dashboard/stats', [DashboardController::class, 'stats'])->name('api.dashboard.stats');
+
+    // ✅ Tambahkan route chart-data di sini
+    Route::get('/dashboard/chart-data', [DashboardController::class, 'chartData'])->name('api.dashboard.chartData');
 
     // Profile Routes
     Route::prefix('profile')->name('profile.')->group(function () {
@@ -41,27 +45,38 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Project Routes
     Route::prefix('projects')->name('projects.')->group(function () {
         Route::get('/', [ProjectController::class, 'index'])->name('index');
-        Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
+        Route::post('/', [ProjectController::class, 'store'])->name('store');
         Route::put('/{project}', [ProjectController::class, 'update'])->name('update');
         Route::delete('/{project}', [ProjectController::class, 'destroy'])->name('destroy');
+        Route::post('/{project}/tasks/assign', [TaskController::class, 'assignTask'])->name('tasks.assign');
     });
 
     // Task Routes
     Route::prefix('tasks')->name('tasks.')->group(function () {
         Route::get('/', [TaskController::class, 'index'])->name('index');
+        Route::get('/project/{project}', [TaskController::class, 'indexByProject'])->name('by-project');
         Route::post('/', [TaskController::class, 'store'])->name('store');
         Route::put('/{task}', [TaskController::class, 'update'])->name('update');
         Route::delete('/{task}', [TaskController::class, 'destroy'])->name('destroy');
         Route::patch('/{task}/toggle-status', [TaskController::class, 'toggleStatus'])->name('toggle-status');
+        Route::patch('/{task}/status', [TaskController::class, 'updateStatus'])->name('update-status');
+        Route::post('/{task}/comments', [TaskController::class, 'storeComment'])->name('comments.store');
     });
 
-    // Admin Routes
+    // Admin Routes (Manage Users)
     Route::prefix('manage-users')->name('users.')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('index');
         Route::post('/', [UserController::class, 'store'])->name('store');
         Route::put('/{user}', [UserController::class, 'update'])->name('update');
         Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
     });
+
+    Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(function () {
+    Route::get('stats', [DashboardController::class, 'getStats'])->name('stats');
+    Route::get('chart-data', [DashboardController::class, 'getChartData'])->name('chartData');
+    Route::get('overdue-tasks', [DashboardController::class, 'getOverdueTasks'])->name('overdueTasks');
+    Route::get('tasks-by-owner', [DashboardController::class, 'getTasksByOwner'])->name('tasksByOwner');
+});
 
     // Static Pages
     Route::get('/notifications', function () {
@@ -72,31 +87,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('Roles');
     })->name('roles');
 
-    Route::get('/trash', function () {
-        return Inertia::render('Trash');
-    })->name('trash');
-
-    // Comment Routes
-    Route::post('/tasks/{task}/comments', [CommentController::class, 'store'])->name('comments.store');
-    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
-});
-
-// Include additional auth routes from Laravel Breeze
-require __DIR__.'/auth.php';
-
-Route::middleware(['auth'])->group(function () {
-    // Tasks Routes
-    Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
-    Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
-    Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
-    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
-    
-    // Task Comments Routes
-    Route::post('/tasks/{task}/comments', [CommentController::class, 'store'])->name('tasks.comments.store');
-    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
-
     // Trash Routes
     Route::get('/trash', [TrashController::class, 'index'])->name('trash.index');
     Route::post('/trash/restore', [TrashController::class, 'restore'])->name('trash.restore');
     Route::delete('/trash/force-delete', [TrashController::class, 'forceDelete'])->name('trash.force-delete');
+
+    // Comment Delete Route
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+
+    // Calendar Route
+    Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
 });
+
+// Tambahan route dari Laravel Breeze
+require __DIR__.'/auth.php';

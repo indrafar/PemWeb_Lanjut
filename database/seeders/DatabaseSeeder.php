@@ -2,8 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class DatabaseSeeder extends Seeder
 {
@@ -12,9 +13,47 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Reset cached roles and permissions
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
+        // Delete existing roles and permissions
+        Role::query()->delete();
+        Permission::query()->delete();
 
-        // Panggil seeder lainnya
+        // Create roles
+        $adminRole = Role::create(['name' => 'Admin']);
+        $managerRole = Role::create(['name' => 'Project Manager']);
+        $memberRole = Role::create(['name' => 'Team Member']);
+
+        // Create permissions
+        $permissions = [
+            'create tasks',
+            'edit tasks',
+            'delete tasks',
+            'manage users',
+            'manage projects'
+        ];
+
+        foreach ($permissions as $permission) {
+            Permission::create(['name' => $permission]);
+        }
+
+        // Assign permissions to roles
+        $adminRole->givePermissionTo(Permission::all());
+        
+        $managerRole->givePermissionTo([
+            'create tasks',
+            'edit tasks',
+            'delete tasks',
+            'manage projects'
+        ]);
+
+        $memberRole->givePermissionTo([
+            'create tasks',
+            'edit tasks'
+        ]);
+
+        // Call UserPermissionSeeder
         $this->call([
             UserPermissionSeeder::class,
         ]);
