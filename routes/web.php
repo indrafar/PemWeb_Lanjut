@@ -29,11 +29,12 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // CONSOLIDATED API Dashboard Routes (Ensure these names match your React calls)
+    Route::get('/api/dashboard/stats', [DashboardController::class, 'getStats'])->name('api.dashboard.stats'); // Changed method to getStats for consistency
+    Route::get('/api/dashboard/chart-data', [DashboardController::class, 'getChartData'])->name('api.dashboard.chartData');
+    Route::get('/api/dashboard/overdue-tasks', [DashboardController::class, 'getOverdueTasks'])->name('api.dashboard.overdueTasks');
+    Route::get('/api/dashboard/tasks-by-owner', [DashboardController::class, 'getTasksByOwner'])->name('api.dashboard.tasksByOwner');
 
-    Route::get('/dashboard/stats', [DashboardController::class, 'stats'])->name('api.dashboard.stats');
-
-    // ✅ Tambahkan route chart-data di sini
-    Route::get('/dashboard/chart-data', [DashboardController::class, 'chartData'])->name('api.dashboard.chartData');
 
     // Profile Routes
     Route::prefix('profile')->name('profile.')->group(function () {
@@ -70,13 +71,6 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{user}', [UserController::class, 'update'])->name('update');
         Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
     });
-
-    Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(function () {
-    Route::get('stats', [DashboardController::class, 'getStats'])->name('stats');
-    Route::get('chart-data', [DashboardController::class, 'getChartData'])->name('chartData');
-    Route::get('overdue-tasks', [DashboardController::class, 'getOverdueTasks'])->name('overdueTasks');
-    Route::get('tasks-by-owner', [DashboardController::class, 'getTasksByOwner'])->name('tasksByOwner');
-});
 
     // Static Pages
     Route::get('/notifications', function () {

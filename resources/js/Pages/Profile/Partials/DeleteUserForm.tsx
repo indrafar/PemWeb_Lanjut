@@ -1,5 +1,5 @@
 import DangerButton from '@/Components/DangerButton';
-import InputError from '@/Components/InputError';
+import {InputError} from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';

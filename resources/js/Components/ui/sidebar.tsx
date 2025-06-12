@@ -5,10 +5,10 @@ type SidebarContextType = {
   toggle: () => void;
 };
 
-// Buat dan export context sekali saja
+// Add 'export' here
 export const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
-export function SidebarProvider({ children }: { children: ReactNode }) {
+export function   SidebarProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(true);
   const toggle = () => setIsOpen(!isOpen);
 
@@ -23,5 +23,18 @@ export function SidebarTrigger() {
   const context = useContext(SidebarContext);
   if (!context) throw new Error('SidebarTrigger must be used inside SidebarProvider');
 
+  return (
+    <button onClick={context.toggle}>
+      Toggle Sidebar
+    </button>
+  );
+}
 
+// ✅ INI WAJIB DITAMBAHKAN agar bisa di-import
+export function useSidebar() {
+  const context = useContext(SidebarContext);
+  if (!context) {
+    throw new Error('useSidebar must be used within a SidebarProvider');
+  }
+  return context;
 }
